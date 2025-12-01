@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace advent;
 
-public class Day1
+public static class Day1
 {
     public static void Run(string fileName)
     {
@@ -13,31 +13,37 @@ public class Day1
         {
             var direction = line[0];
             var distance = int.Parse(line.Substring(1));
-            currentPosition = Move(direction, distance, currentPosition);
-            Console.WriteLine($"{line} : {currentPosition}");
-            if (currentPosition == 0)
-            {
-                timesAtZero++;
-            }
+            (currentPosition, timesAtZero) = Move(direction, distance, currentPosition, timesAtZero);
+            Console.WriteLine($"{line} : {currentPosition}, {timesAtZero}");
         }
         Console.WriteLine(timesAtZero);
     }
 
-    private static int Move(char direction, int distance, int startPosition)
+    private static (int, int) Move(char direction, int distance, int startPosition, int timesAtZero)
     {
-        var newPosition = 0;
+        var newPosition = startPosition;
+        var newTimesAtZero = timesAtZero;
+        for (var i = 0; i < distance; i++)
+        {
+            (newPosition, newTimesAtZero) = Click(direction, newPosition, newTimesAtZero);
+        }
+        
+        return (newPosition, newTimesAtZero);
+    }
+
+    private static (int, int) Click(char direction, int startPosition, int timesAtZero)
+    {
+        var newPosition = startPosition;
         if (direction == 'L')
         {
-            newPosition = startPosition - (distance % 100);
-            if (newPosition < 0)
-            {
-                newPosition += 100;
-            }
+            newPosition--;
+            if(newPosition < 0) newPosition += 100;
         }
         else
         {
-            newPosition = (startPosition + distance) % 100;
-        }
-        return newPosition;
+            newPosition++;
+            if(newPosition > 99) newPosition -= 100;
+        } 
+        return (newPosition, newPosition==0 ? timesAtZero + 1: timesAtZero);
     }
 }
