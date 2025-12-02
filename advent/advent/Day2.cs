@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace advent;
 
@@ -42,20 +43,36 @@ public static class Day2
     private static long[] FancyNumbersInRange(Range range)
     {
         var foundNumbers = new List<long>();
-        var startString = range.Start.ToString();
-        if (startString.Length % 2 == 1) startString = "0" + startString;
-        var startHalf = startString.Substring(0, startString.Length / 2);
-        var start = long.Parse(startHalf);
-        while (true)
+        var initialString = range.Start.ToString();
+        
+        var maxRepeats = range.End.ToString().Length;
+        for (var repeats = 2; repeats <= maxRepeats; repeats++)
         {
-            var num = long.Parse(start.ToString() + start.ToString());
-            if (num <= range.End && num >= range.Start)
+            var startString = initialString;
+            if (startString.Length % repeats != 0)
+                startString = new string('0', startString.Length % repeats) + startString;
+            var startHalf = startString.Substring(0, startString.Length / repeats);
+            Console.WriteLine($"{startHalf} -> {startString}");
+            var start = long.Parse(startHalf);
+            while (true)
             {
-                foundNumbers.Add(num);
-            }
+                var numString = new StringBuilder();
+                for (var i = 0; i < repeats; i++)
+                {
+                    numString.Append(start.ToString());
+                }
 
-            if (num > range.End) break;
-            start++;
+                var num = long.Parse(numString.ToString());
+                if (num <= range.End && num >= range.Start)
+                {
+                    Console.WriteLine($"{num} -> {range.End}");
+                    if(!foundNumbers.Contains(num))
+                        foundNumbers.Add(num);
+                }
+
+                if (num > range.End) break;
+                start++;
+            }
         }
 
         return foundNumbers.ToArray();
