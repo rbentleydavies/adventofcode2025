@@ -27,5 +27,8 @@ switch (day)
     case 2:
         Day2.Run(filepath);
         break;
+    case 3:
+        Day3.Run(filepath);
+        break;
 }
 Console.WriteLine("Completed");
