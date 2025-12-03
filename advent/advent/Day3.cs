@@ -8,25 +8,31 @@ public static class Day3
     public static void Run(string fileName)
     {
         var lines = File.ReadAllLines(fileName);
-        var numbers = new List<int>();
+        var numbers = new List<long>();
         foreach (var line in lines)
         {
-            
-            var (bestFirstNumber, bestFirstIndex)  = GetBestNumber(line.Substring(0, line.Length - 1));
-            var (bestSecondNumber, bestSecondIndex) = GetBestNumber(line.Substring(bestFirstIndex+1, line.Length-bestFirstIndex-1));
-            
-            numbers.Add(bestFirstNumber * 10 + bestSecondNumber);
+            long number = 0;
+            int position = 0;
+            for (int step = 1; step <= 12; step++)
+            {
+                var (x, i) = GetBestNumber(line.Substring(position, line.Length - position - (12 - step)));
+                position += i + 1;
+                number += x * (long)Math.Pow(10, 12 - step);
+                Console.WriteLine($"- {number}");
+            }
+            numbers.Add(number);
         }
 
-        foreach (var number in numbers)
+        foreach (var num in numbers)
         {
-            Console.WriteLine($"{number}");
+            Console.WriteLine($"* {num}");
         }
         Console.WriteLine(numbers.Sum());
     }
 
     private static (int, int) GetBestNumber(string line)
     {
+        Console.WriteLine(line);
         var bestNumber = -1;
         var bestIndex = -1;
         for (var i = 0; i<line.Length; i++)
