@@ -30,5 +30,32 @@ switch (day)
     case 3:
         Day3.Run(filepath);
         break;
+    case 4:
+        Day4.Run(filepath);
+        break;
+    case 5:
+        Day5.Run(filepath);
+        break;
+    case 6:
+        Day6.Run(filepath);
+        break;
+    case 7:
+        Day7.Run(filepath);
+        break;
+    case 8:
+        Day8.Run(filepath);
+        break;
+    case 9:
+        Day9.Run(filepath); 
+        break;
+    case 10:
+        Day10.Run(filepath);
+        break;
+    case 11:
+        Day11.Run(filepath);
+        break;
+    case 12:
+        Day12.Run(filepath);
+        break;
 }
 Console.WriteLine("Completed");
