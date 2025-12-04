@@ -2,9 +2,9 @@
 
 public static class FileParser
 {
-    public static string[] ReadFileAsLineArray(string fileName)
+    public static char[][] ReadFileAsTwoDimensionalArray(string fileName)
     {
         var lines = File.ReadAllLines(fileName);
-        return lines;
+        return lines.Select(line => line.ToCharArray()).ToArray();
     }
 }
