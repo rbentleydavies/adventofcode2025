@@ -9,9 +9,14 @@ public static class Day4
     {
         var map = FileParser.ReadFileAsTwoDimensionalArray(fileName);
         var accessiblePaperRollCount = 0;
-        
-        var (xmap, xaccessiblePaperRollCount) = MovePaperAroundMap(map);
-        Console.WriteLine(xaccessiblePaperRollCount);
+        var newAccessiblePaperRollCount = 0;
+        do
+        {
+            (map, newAccessiblePaperRollCount) = MovePaperAroundMap(map);
+            accessiblePaperRollCount += newAccessiblePaperRollCount;
+        } while (newAccessiblePaperRollCount > 0);
+
+        Console.WriteLine(accessiblePaperRollCount);
     }
 
     private static (char[][], int) MovePaperAroundMap(char[][] map)
