@@ -9,20 +9,34 @@ public static class Day6
     {
         var lines = File.ReadAllLines(fileName);
         var numberSet = new List<long[]>();
-        string[] operators = [];
-        foreach (var line in lines)
+        string[] operators = lines.Last().Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray();
+        var numbers = new List<long>();
+        for (var c = 0; c < lines[0].Length; c++)
         {
-            if (line[0] == '+' || line[0] == '*')
+            var numberString = "";
+            for (var r = 0; r < lines.Length - 1; r++)
             {
-                operators = line.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray();
-                Console.WriteLine($"Found {operators.Length} operators");
-                continue;
+                numberString += lines[r][c];
             }
-            var numbers = line.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => long.Parse(x)).ToArray();
-            numberSet.Add(numbers);
-            Console.WriteLine($"Found {numbers.Length} numbers");
+
+            if (long.TryParse(numberString, out var number))
+            {
+                numbers.Add(number);
+            }
+            else
+            {
+                numberSet.Add(numbers.ToArray());
+                numbers.Clear();
+            }
+        }
+
+        if (numberSet.Count != 0)
+        {
+            numberSet.Add(numbers.ToArray());
         }
         var numberArray = numberSet.ToArray();
+        Console.WriteLine($"There are {numberArray.Length} numbers in this set.");
+        Console.WriteLine($"There are {operators.Length} operators in this set.");
         long runningTotal = 0;
         for (var i = 0; i < operators.Length; i++)
         {
@@ -30,11 +44,11 @@ public static class Day6
             switch (op)
             {
                 case "+":
-                    var resultPlus = numberArray.Sum(x => x[i]);
+                    var resultPlus = numberArray[i].Sum();
                     runningTotal += resultPlus;
                     break;
                 case "*":
-                    var resultTimes = numberArray.Aggregate((long)1, (a, b) =>  a * b[i] );
+                    var resultTimes = numberArray[i].Aggregate((long)1, (a, b) =>  a * b );
                     runningTotal += resultTimes;
                     break;
             }
