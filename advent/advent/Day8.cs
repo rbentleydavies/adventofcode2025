@@ -13,41 +13,99 @@ public static class Day8
         var shortestJunctions = new Junction[2];
         var circuits = new List<List<Junction>>();
         var connections = new List<Junction[]>();
-        for (var i = 0; i < 1000; i++)
+        var connectedJunctions = new List<Junction>();
+        var lastShortestJunction = new Junction[2];
+        var possibleConnections = new List<Connection>();
+        foreach (var junctionA in junctions)
         {
-            foreach (var junctionA in junctions)
+            foreach (var junctionB in junctions)
             {
-                foreach (var junctionB in junctions)
+                if (junctionA.Equals(junctionB)) continue;
+                //if (connections.Any(x => x.Any(y => y.Equals(junctionA))
+                //                         && x.Any(y => y.Equals(junctionB)))) continue;
+                
+                var distance = DistanceBetweenJunctions(junctionA, junctionB);
+                var possibleConnection = new Connection
                 {
-                    if (junctionA.Equals(junctionB)) continue;
-                    if (connections.Any(x => x.Any(y => y.Equals(junctionA))
-                                          && x.Any(y => y.Equals(junctionB)))) continue;
-                    var distance = DistanceBetweenJunctions(junctionA, junctionB);
-                    if (distance < shortestDistance)
-                    {
-                        shortestDistance = distance;
-                        shortestJunctions = [junctionA, junctionB];
-                    }
+                    Junctions = new Junction[] { junctionA, junctionB }
+                        .OrderBy(j => j.x)
+                        .ThenBy(j => j.y)
+                        .ThenBy(j => j.z)
+                        .ToArray(),
+                    Distance = distance
+                };
+                // if (!possibleConnections.Any(x =>
+                //         x.Junctions[0] == possibleConnection.Junctions[0] &&
+                //         x.Junctions[1] == possibleConnection.Junctions[1]))
+                {
+                    possibleConnections.Add(possibleConnection);
                 }
             }
-
-            //Console.WriteLine($"Shortest distance: {shortestDistance}");
-            Console.WriteLine($"Shortest Junctions: {shortestJunctions[0]},  {shortestJunctions[1]}");
-            connections.Add(shortestJunctions);
-            AddToCircuit(circuits, shortestJunctions);
-            shortestDistance = double.MaxValue;
+        }
+        Console.WriteLine(possibleConnections.Count);
+        
+        // while(connectedJunctions.Count < junctions.Length)
+        // {
+        //     foreach (var junctionA in junctions)
+        //     {
+        //         foreach (var junctionB in junctions)
+        //         {
+        //             if (junctionA.Equals(junctionB)) continue;
+        //             if (connections.Any(x => x.Any(y => y.Equals(junctionA))
+        //                                   && x.Any(y => y.Equals(junctionB)))) continue;
+        //             var distance = DistanceBetweenJunctions(junctionA, junctionB);
+        //             if (distance < shortestDistance)
+        //             {
+        //                 shortestDistance = distance;
+        //                 shortestJunctions = [junctionA, junctionB];
+        //             }
+        //         }
+        //     }
+        //
+        //     if (shortestJunctions[0] == null) break;
+        //     if (!connectedJunctions.Any(y => y.Equals(shortestJunctions[0])))
+        //     {
+        //         connectedJunctions.Add(shortestJunctions[0]);
+        //     }
+        //     if (!connectedJunctions.Any(y => y.Equals(shortestJunctions[1])))
+        //     {
+        //         connectedJunctions.Add(shortestJunctions[1]);
+        //     }
+        //     //Console.WriteLine($"Shortest distance: {shortestDistance}");
+        //     Console.WriteLine($"Shortest Junctions: {shortestJunctions[0]},  {shortestJunctions[1]}");
+        //     connections.Add(shortestJunctions);
+        //     //AddToCircuit(circuits, shortestJunctions);
+        //     shortestDistance = double.MaxValue;
+        //     lastShortestJunction = shortestJunctions;
+        //     shortestJunctions = new Junction[2];
+        //     //Console.WriteLine($"There are {circuits.Count} circuits");
+        //     //foreach (var circuit in circuits.OrderByDescending(c=>c.Count))
+        //     //{
+        //     //    Console.Write($"{circuit.Count} ,");
+        //     //}
+        //     //Console.WriteLine();
+        //     Console.WriteLine(connectedJunctions.Count);
+        //
+        // }
+        //Console.WriteLine(circuits.OrderByDescending(c=>c.Count).Take(3).Aggregate(1,(a,b)=>a * b.Count));
+        foreach (var connection in possibleConnections.OrderBy(x => x.Distance))
+        {
+            AddToCircuit(circuits, connection.Junctions);
+            lastShortestJunction = connection.Junctions;
+            Console.WriteLine($"Shortest Junctions: {lastShortestJunction[0]},  {lastShortestJunction[1]}");
             Console.WriteLine($"There are {circuits.Count} circuits");
             foreach (var circuit in circuits.OrderByDescending(c=>c.Count))
             {
                 Console.Write($"{circuit.Count} ,");
             }
             Console.WriteLine();
-            
+            var nonEmptyCircuits = circuits.Where(x => x.Count > 0);
+            if (nonEmptyCircuits.Count() == 1 && nonEmptyCircuits.First().Count == junctions.Length)
+                break;
         }
-        Console.WriteLine(circuits.OrderByDescending(c=>c.Count).Take(3).Aggregate(1,(a,b)=>a * b.Count));
-
         
         Console.WriteLine(junctions.Length);
+        Console.WriteLine(lastShortestJunction[0].x * lastShortestJunction[1].x);
     }
 
     public static void AddToCircuit(List<List<Junction>> circuits, Junction[] junctions)
@@ -97,15 +155,20 @@ public static class Day8
                          Math.Pow(junctionA.z - junctionB.z, 2));
     }
 
+    public class Connection
+    {
+        public Junction[] Junctions { get; set; }
+        public double Distance { get; set; }
+    }
     public class Junction
     {
         public Junction(string line)
         {
             var parts = line.Split(',');
             if (parts.Length != 3) throw new Exception();
-            x = int.Parse(parts[0]);
-            y = int.Parse(parts[1]);
-            z = int.Parse(parts[2]);
+            x = long.Parse(parts[0]);
+            y = long.Parse(parts[1]);
+            z = long.Parse(parts[2]);
         }
 
         public override string ToString()
@@ -118,8 +181,8 @@ public static class Day8
             return x == obj.x && y == obj.y && z == obj.z;
         }
 
-        public int x = 0;
-        public int y = 0;
-        public int z = 0;
+        public long x = 0;
+        public long y = 0;
+        public long z = 0;
     }
 }
