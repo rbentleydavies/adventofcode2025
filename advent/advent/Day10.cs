@@ -56,35 +56,39 @@ public static class Day10
             var bestOptionUpperBound = target.Sum();
             Console.WriteLine($"bestOptionLowerBound: {bestOptionLowerBound}");
             Console.WriteLine($"bestOptionUpperBound: {bestOptionUpperBound}");
-            for (var allButtonClicks = bestOptionUpperBound; allButtonClicks >= bestOptionLowerBound; allButtonClicks--)
-            {
-                var startValues = new int[target.Length];
-                Array.Fill(startValues, 0);
-            Console.WriteLine(allButtonClicks);
-                
-                if (isPossible(startValues, target, buttons, allButtonClicks))
-                {
-                    Console.WriteLine($"Success: {allButtonClicks}");
-                    totalBestOptions += allButtonClicks;
-                    break;
-                }
-            }
-            // var possibleOptionStrings = new List<char[]>();
-            // for (var i = 0; i < Math.Pow(2, buttons.Count); i++)
+            // for (var allButtonClicks = bestOptionUpperBound; allButtonClicks >= bestOptionLowerBound; allButtonClicks--)
             // {
-            //     var formatString = $"B{buttons.Count}";
-            //     var optionsString = i.ToString(formatString).ToCharArray();
-            //     var value = buttons
-            //         .Where((t, x) => optionsString[x] == '1')
-            //         .Aggregate(0, (current, t) => current ^ t);
-            //     if (value == target)
-            //         possibleOptionStrings.Add(optionsString);
+            //     var startValues = new int[target.Length];
+            //     Array.Fill(startValues, 0);
+            // Console.WriteLine(allButtonClicks);
+            //     
+            //     if (isPossible(startValues, target, buttons, allButtonClicks))
+            //     {
+            //         Console.WriteLine($"Success: {allButtonClicks}");
+            //         totalBestOptions += allButtonClicks;
+            //         break;
+            //     }
             // }
-            // foreach (var possibleOptionString in possibleOptionStrings)
-            //     Console.WriteLine(new string(possibleOptionString));
-            // var bestOption = possibleOptionStrings.Min(s => s.Count(c => c == '1'));
-            // Console.WriteLine($"best: {bestOption}");
-            // totalBestOptions+=bestOption;
+            var A = new int[length, buttons.Count];
+            for (var s = 0; s < buttons.Count; s++)
+            for (var t = 0; t < length; t++)
+                A[t, s] = buttons[s][t];
+
+            var B = target.Select(t => (int)t).ToArray();
+            
+            // Use optimized method to find only the minimum sum solution
+            var result = LinearEquationSolver.FindMinimumSumSolution(A, B);
+            
+            if (result != null)
+            {
+                var bestOption = result.Sum();
+                Console.WriteLine($"Best result: {bestOption}");
+                totalBestOptions += bestOption;
+            }
+            else
+            {
+                Console.WriteLine("No solution found!");
+            }
         }
 
         Console.WriteLine($"Total best options:{totalBestOptions}");
@@ -94,7 +98,7 @@ public static class Day10
     {
         var nextButton = buttons.FirstOrDefault();
         if (nextButton == null) return false;
-        
+
         var success = false;
         for (var i = maxPresses; i >= 0; i--)
         {
@@ -112,10 +116,7 @@ public static class Day10
                     break;
                 }
 
-                if (trialValues[j] < targetValues[j])
-                {
-                    notMatchYet = true;
-                }
+                if (trialValues[j] < targetValues[j]) notMatchYet = true;
             }
 
             if (fail) continue;
@@ -132,6 +133,14 @@ public static class Day10
                 break;
             }
         }
+
         return success;
+    }
+
+    public class Button
+    {
+        public int Index { get; set; }
+        public int[] Changes { get; set; }
+        public int[] PossibleOptions { get; set; }
     }
 }
